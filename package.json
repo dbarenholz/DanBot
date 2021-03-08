@@ -1,0 +1,19 @@
+{
+  "name": "danbot",
+  "version": "0.0.1",
+  "description": "A custom discord bot made by Daniel, hence the name DanBot!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "node"
+  ],
+  "author": "Daniel Barenholz",
+  "license": "The Unlicense",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
