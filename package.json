@@ -4,6 +4,7 @@
   "description": "A custom discord bot made by Daniel, hence the name DanBot!",
   "main": "index.js",
   "scripts": {
+    "build": "tsc; node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -12,8 +13,14 @@
     "node"
   ],
   "author": "Daniel Barenholz",
-  "license": "The Unlicense",
+  "repository": "https://github.com/dbarenholz/DanBot",
+  "license": "Unlicense",
   "dependencies": {
+    "discord-akairo": "^8.1.0",
     "discord.js": "^12.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.32",
+    "typescript": "^3.3.3"
   }
 }
