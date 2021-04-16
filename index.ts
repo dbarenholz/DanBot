@@ -5,40 +5,28 @@ import { join } from "path";
 import { AkairoClient, CommandHandler, ListenerHandler } from "discord-akairo";
 
 // own files
-import { botToken, ownerID } from "./secret/secret";
-
-// const commandsPath = join(__dirname, "..", "commands/");
-// const listenersPath = join(__dirname, "..", "listeners/");
+import botToken from "./secret/token";
+import ownerID from "./secret/owner";
+import TaskHandler from "./my_modules/Task/TaskHandler";
 
 /**
  * @author Barenholz D.
  * @class DanBot -- the bot itself.
  * @description DanBot main entrypoint
- * @version 0.1.0
+ * @version 0.2.0
  */
 class DanBot extends AkairoClient {
-  // Declare handler types.
   commandHandler: CommandHandler;
   listenerHandler: ListenerHandler;
+  taskHandler: TaskHandler;
 
-  // Create DanBot instance
   constructor() {
-    // AkairoClient constructor call
     super(
-      // options - options for AkairoClient
       {
         ownerID: ownerID,
       },
-      // clientOptions - options for discord.js
       {
         disableMentions: "everyone",
-        presence: {
-          status: "online",
-          activity: {
-            name: "Being super cool. [d!help] for help!",
-            type: "CUSTOM_STATUS",
-          },
-        },
       }
     );
 
@@ -58,13 +46,21 @@ class DanBot extends AkairoClient {
       directory: join(__dirname, "listeners"),
     });
 
-    // Load all commands and listeners
+    // Set task handler
+    this.taskHandler = new TaskHandler(this, {
+      directory: join(__dirname, "tasks"),
+    });
+
+    // Load/Register all commands/listeners/tasks
     this.commandHandler.useListenerHandler(this.listenerHandler);
     this.listenerHandler.loadAll();
     this.commandHandler.loadAll();
+    this.taskHandler.registerAndLoadAll();
   }
 }
 
 // Create the bot and login using token
 const bot = new DanBot();
 bot.login(botToken);
+
+export default DanBot;

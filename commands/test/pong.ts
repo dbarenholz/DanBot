@@ -12,16 +12,16 @@ class PongCommand extends Command {
   constructor() {
     super("ping", {
       aliases: ["ping", "pong"],
-      // args: [],
-      category: "testing",
+      category: "test",
       description: {
         content: "A simple ping pong command.",
-        usage: "[command]",
+        usage: "ping",
+        examples: ["ping"],
       },
     });
   }
   // Define what to do when it gets a message.
-  exec(message: Message) {
+  public exec(message: Message): Promise<Message> {
     return message.util.send("Pong!");
   }
 }

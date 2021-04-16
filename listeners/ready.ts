@@ -1,8 +1,12 @@
 import { Listener } from "discord-akairo";
 
-// Create status
+/**
+ * @author Barenholz D.
+ * @class Ready
+ * @description A listener that when ready sets the bot activity
+ * @version 0.2.0
+ */
 class Ready extends Listener {
-  // Create Listener instance on ready event
   constructor() {
     super("ready", {
       event: "ready",
@@ -12,9 +16,8 @@ class Ready extends Listener {
 
   // Execute following
   exec() {
-    setInterval(() => this.client.user.setActivity("I am playing pingpong."), 15000);
-
-    console.log(`${this.client.user.tag} is online!`);
+    this.client.user.setActivity("Feeling cute!");
+    console.log(`${this.client.user.tag} is online and ready to steal your waifus!`);
   }
 }
 
