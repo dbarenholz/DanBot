@@ -13,7 +13,7 @@ import TaskHandler from "./my_modules/Task/TaskHandler";
  * @author Barenholz D.
  * @class DanBot -- the bot itself.
  * @description DanBot main entrypoint
- * @version 0.2.0
+ * @version 0.2.1
  */
 class DanBot extends AkairoClient {
   commandHandler: CommandHandler;
@@ -38,6 +38,7 @@ class DanBot extends AkairoClient {
       allowMention: true,
       defaultCooldown: 500,
       commandUtil: true,
+      handleEdits: false,
       directory: join(__dirname, "commands"),
     });
 

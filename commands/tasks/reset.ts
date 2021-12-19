@@ -1,67 +1,48 @@
 import { Command } from "discord-akairo";
 import { Message } from "discord.js";
+import DanBot from "../..";
 import { get_client, get_task_IDs, handle_empty_arguments } from "../_helper";
 
-import DanBot from "../..";
-
-class TaskStopCommand extends Command {
+class TaskResetCommand extends Command {
   constructor() {
-    super("task-stop", {
+    super("task-reset", {
       category: "task",
       description: {
-        content: "Stops a task based on ID",
-        usage: "task stop [ID]",
+        content:
+          "Resets data related to a particular (running or paused) task. Note that it does not change the running/paused state of the task",
+        usage: "task reset [ID]",
         examples: [
-          "task stop all",
-          "task stop MyCoolTask",
-          "task stop MyCoolTask MyCoolTask2 MyCoolTask3",
-          "task pause all",
-          "task pause MyCoolTask",
-          "task pause MyCoolTask MyCoolTask2 MyCoolTask3",
-          "task break all",
-          "task break MyCoolTask",
-          "task break MyCoolTask MyCoolTask2 MyCoolTask3",
+          "task reset all",
+          "task reset MyCoolTask",
+          "task reset MyCoolTask MyCoolTask2 MyCoolTask3",
+          "task reload all",
+          "task reload MyCoolTask",
+          "task reload MyCoolTask MyCoolTask2 MyCoolTask3",
         ],
       },
     });
   }
 
-  /**
-   * Stops a single task
-   *
-   * @param client   the client with the task
-   * @param task_id  the id of the task
-   * @returns A promise that resolves with a message regardless
-   *          of success or fail to provide to the user running the command
-   */
-  stop(client: DanBot, task_id: string): Promise<String> {
+  reset(client: DanBot, task_id: string): Promise<String> {
     return new Promise<String>((resolve, _reject) => {
       let td = client.taskHandler.tasks.get(task_id);
       if (td == undefined) {
         resolve(`${task_id}: does not exist`);
       } else {
         td.task
-          .pause()
+          .reset()
           .then((msg: any) => resolve(`${task_id}: ${msg}`))
           .catch((err: any) => resolve(`${task_id}: ${err}`));
       }
     });
   }
 
-  /**
-   * Starts all tasks with particular IDs
-   *
-   * @param client the client with tasks
-   * @param ids    the IDs of the task to start
-   * @returns A promise that resolves with a message, regardless
-   *          of success or fail, to provide to the user running the command
-   */
-  stop_all(client: DanBot, ids: string[]): Promise<String> {
+  reset_all(client: DanBot, ids: string[]): Promise<String> {
     return new Promise<String>((resolve, _reject) => {
       let promises = [];
 
       for (const id of ids) {
-        promises.push(this.stop(client, id));
+        promises.push(this.reset(client, id));
       }
 
       Promise.all(promises).then((values) => {
@@ -94,14 +75,14 @@ class TaskStopCommand extends Command {
     // Whether or not we want to start all tasks
     if (args[0] == "all") {
       // Start all tasks
-      await this.stop_all(client, ids).then((msg) => {
+      await this.reset_all(client, ids).then((msg) => {
         str += msg;
       });
     } else {
       // Start given tasks
       const uniqueTasks = [...new Set<string>(args)];
 
-      await this.stop_all(client, uniqueTasks).then((msg) => {
+      await this.reset_all(client, uniqueTasks).then((msg) => {
         str += msg;
       });
     }
@@ -111,4 +92,4 @@ class TaskStopCommand extends Command {
   }
 }
 
-export default TaskStopCommand;
+export default TaskResetCommand;

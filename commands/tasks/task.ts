@@ -4,7 +4,7 @@ import { Command, Flag } from "discord-akairo";
  * @author Barenholz D.
  * @class TaskCommand
  * @description The task module command
- * @version 0.1.0
+ * @version 0.2.1
  */
 class TaskCommand extends Command {
   constructor() {
@@ -13,6 +13,20 @@ class TaskCommand extends Command {
       category: "task",
       description: {
         content: "Task module",
+        usage: "task [SUBCOMMAND]",
+        examples: [
+          "task list",
+          "task information",
+          "task start MyCoolTask",
+          "task resume MyCoolTask",
+          "task continue MyCoolTask",
+          "task stop MyCoolTask",
+          "task pause MyCoolTask",
+          "task break MyCoolTask",
+          "task reset MyCoolTask",
+          "task reload MyCoolTask",
+          "task set MyCoolTask 818625852010004500",
+        ],
       },
     });
   }
@@ -20,14 +34,14 @@ class TaskCommand extends Command {
   *args() {
     const method = yield {
       type: [
-        // [module-id, alias1, alias2...]
         ["task-list", "list", "information"],
-        ["task-start", "start", "resume"],
-        ["task-stop", "stop", "pause"],
-        ["task-restart", "restart", "reload"],
-        ["task-destroy", "destroy", "remove"],
+        ["task-start", "start", "resume", "continue"],
+        ["task-stop", "stop", "pause", "break"],
+        ["task-reset", "reset", "reload"],
+        ["task-set", "set"],
       ],
-      otherwise: `Check \`d! help task\` for more information`,
+      // TODO: Pretend `d!help task` has been run here, and return that output.
+      otherwise: `Check \`d!help task\` for more information`,
     };
 
     return Flag.continue(method);

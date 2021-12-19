@@ -1,16 +1,16 @@
-import { AkairoClient } from "discord-akairo";
+import type { AkairoClient } from "discord-akairo";
 
 import { Collection } from "discord.js";
 import { readdirSync } from "fs";
 import { join } from "path";
 
-import TaskData from "./TaskData";
+import type TaskData from "./TaskData";
 
 /**
  * @author Barenholz D.
  * @class TaskHandler
  * @description Loads tasks and registers them with EventEmitters
- * @version 0.2.0
+ * @version 0.2.1
  */
 export default class TaskHandler {
   /**

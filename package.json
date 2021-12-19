@@ -16,7 +16,7 @@
   "repository": "https://github.com/dbarenholz/DanBot",
   "license": "Unlicense",
   "dependencies": {
-    "@liqd-js/timed-promise": "^1.1.0",
+    "@dbarenholz/timed-promise": "^0.3.3",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
     "discord-akairo": "^8.1.0",

@@ -1,6 +1,6 @@
 import { Command } from "discord-akairo";
 import { Message } from "discord.js";
-import DanBot from "../..";
+import { get_client, retrieve_task_information } from "../_helper";
 
 // List the tasks
 class TaskListCommand extends Command {
@@ -9,13 +9,10 @@ class TaskListCommand extends Command {
       category: "task",
       description: {
         content: "Show all kinds of task information",
+        usage: "task list",
+        examples: ["task list", "task information"],
       },
     });
-  }
-
-  getTaskInfo(): Array<String> {
-    const client = this.client as DanBot;
-    return client.taskHandler.tasks.keyArray();
   }
 
   public exec(message: Message): Promise<Message> {
@@ -29,7 +26,8 @@ class TaskListCommand extends Command {
     - Task ### - time until it does something
     */
 
-    const info = this.getTaskInfo();
+    const client = get_client(this);
+    const info = retrieve_task_information(client);
 
     let str = "";
     for (const id of info) {

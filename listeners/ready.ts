@@ -16,8 +16,8 @@ class Ready extends Listener {
 
   // Execute following
   exec() {
-    this.client.user.setActivity("Feeling cute!");
-    console.log(`${this.client.user.tag} is online and ready to steal your waifus!`);
+    this.client.user.setActivity("slave for Daniel!");
+    console.log(`${this.client.user.tag} is online and ready to go!`);
   }
 }
 

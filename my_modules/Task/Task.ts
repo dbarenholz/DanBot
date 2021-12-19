@@ -1,75 +1,78 @@
-import TimedPromise from "@liqd-js/timed-promise";
-import { AkairoClient, AkairoError } from "discord-akairo";
+import TimedPromise from "@dbarenholz/timed-promise";
+import { AkairoError } from "discord-akairo";
 import TaskHandler from "./TaskHandler";
+import type { AkairoClient } from "discord-akairo";
+import TaskOptions from "./TaskOptions";
 
 /**
  * @author Barenholz D.
  * @class Task
  * @description A Task object is similar to a command execution, but without command!
  *              Tasks are pieces of code that the bot does on regular basis, such as every day, or every hour.
- * @version 0.2.0
+ * @version 0.2.1
  */
 export default class Task {
-  // The name of the task
+  // See TaskOptions type for information
   id: string;
-  // Interval for which to perform the task
   interval: number;
-  // Whether or not to run this task on startup of the bot
-  runOnStart: boolean = true;
-  // Whether or not to wait for the bot to be ready
-  awaitReady: boolean = true;
-  // The handler of the task
-  handler: TaskHandler;
-  // The category of the task, can be empty
-  category?: string = "testing";
-  // The description of the task, can be empty
-  description?: string = "";
-  // Identifier of what channel this task runs in
-  channel?: string = null;
-  // Data (placeholders) related to the task
-  // Note that every item should be of the form
-  // data: {
-  //   something: {doc: "documentation", value: actual value}
-  // }
-  data?: any = null;
+  channel: string;
+  runOnStart?: boolean;
+  awaitReady?: boolean;
+  handler?: TaskHandler;
+  category?: string;
+  description?: string;
+  data?: any;
 
   /**
-   * @param id - The task name
-   * @param options - The options for this task
+   * @param id       The task name
+   * @param options  The options for this task
    */
-  constructor(id: string, { category, description, channel, data, interval }) {
+  constructor(options: TaskOptions) {
+    // Grab fields from options
+    const { id, interval, channel, runOnStart, awaitReady, handler, category, description, data } = options;
+
+    // Set fields
     this.id = id;
     this.interval = interval;
-    this.category = category;
-    this.description = description;
     this.channel = channel;
-    this.data = data;
-    this.handler = null;
+    this.runOnStart = runOnStart || false;
+    this.awaitReady = awaitReady || true;
+    this.category = category || "test";
+    this.description = description || "";
+    this.data = data || null;
+    this.handler = handler || null;
   }
 
-  // Task itself
-  // Needs _this parameter to pass through correct scope.
-  public async task(_this: Task, client: AkairoClient, ms: Number): TimedPromise {
+  /**
+   * The task to perform.
+   *
+   * @param _this    The task instance
+   * @param _client   The client that runs the task
+   * @param _ms       Amount of milliseconds that the task is allowed to take before throwing an error due to timeout
+   */
+  public task(_this: Task, _client: AkairoClient, _ms: Number): TimedPromise<String> {
     // Should be implemented in created task!
     throw new AkairoError(`NOT_IMPLEMENTED ${this.constructor.name} task`);
   }
 
-  // Wrapper method as called in TaskHandler
-  public async do(client: AkairoClient): TimedPromise {
+  /**
+   * The method as called by `TaskHandler`. Wraps the `task()` method and sets the interval.
+   *
+   * @param client  The client that runs a task
+   */
+  public async do(client: AkairoClient) {
     let ms = 0;
 
     const timerID = setInterval(this.task, this.interval, this, client, ms);
-    // Set relevant interval in TaskHandler.tasks
     this.handler.tasks.get(this.id).timerID = timerID;
   }
 
   /**
-   * Provides functionality to stop a task.
-   * Note that this DOES NOT REMOVE previously saved data items. If removing previously saved data is desired, use destroy();
+   * Pauses a (running) task. Pausing a task keeps its current state.
    *
-   * @returns A promise that resolves when stopping is successful
+   * @returns A promise that resolves when pausing is successful.
    */
-  public stop(): Promise<string> {
+  public async pause(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.handler.tasks.get(this.id).task.isRunning()) {
         // Task is not running:
@@ -86,21 +89,21 @@ export default class Task {
         }
 
         if (success) {
-          resolve("Task stopped and removed interval from collection.");
+          resolve("Task paused.");
         } else {
-          reject("Could not remove task.");
+          reject("Could not pause task.");
         }
       }
     });
   }
 
   /**
-   * Provides functionality to start a task.
-   * Note that this REUSES previously saved data items. If resetting previously saved data is desired, use restart()
+   * Continues a (paused) task. Continuing a task uses the state the task was in when paused.
+   * If the task was never started, this is identical to starting a new instance of a task.
    *
-   * @returns A promise that resolves when starting is successful
+   * @returns A promise that resolves when continuing is successful.
    */
-  public start(): Promise<string> {
+  public async continue(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.handler.tasks.get(this.id).task.isRunning()) {
         // Task is already running:
@@ -116,16 +119,47 @@ export default class Task {
     });
   }
 
-  // TODO: implement
-  public destroy(): Promise<String> {
-    // first stop, then remove data
-    throw new AkairoError(`NOT_IMPLEMENTED ${this.constructor.name} task restart`);
+  /**
+   * Reset data related to a task to null
+   *
+   * @returns A promise that resolves when done.
+   */
+  public async reset(): Promise<string> {
+    return new Promise((resolve, _reject) => {
+      // Retrieve list of data items
+      const dataItems = Object.keys(this.handler.tasks.get(this.id).task.data);
+
+      // Loop through them
+      for (const dataItem of dataItems) {
+        // Reset this particular item to its initial value
+        const reset = this.handler.tasks.get(this.id).task.data[dataItem].init;
+        this.handler.tasks.get(this.id).task.data[dataItem].value = reset;
+      }
+
+      // resolve
+      resolve("Data has been reset");
+    });
   }
 
-  // TODO: implement
-  public restart(): Promise<String> {
-    // stop, destroy, start
-    throw new AkairoError(`NOT_IMPLEMENTED ${this.constructor.name} task restart`);
+  /**
+   * Sets the channel that this task runs in.
+   *
+   * @param ID  Channel ID to set task to.
+   */
+  public async set_channel(ID: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.handler.client.channels
+        .fetch(ID)
+        .then((channel) => {
+          if (channel == null || channel == undefined) {
+            reject(`Channel with ID '${ID}' does not exist`);
+          }
+
+          this.channel = ID;
+          resolve(`Channel set to channel with ID: '${ID}'`);
+        })
+        .catch(() => reject(`Error getting channel with ID '${ID}'`));
+    });
   }
 
   /**
@@ -133,7 +167,7 @@ export default class Task {
    *
    * @returns a boolean indicating if the task is running
    */
-  public isRunning(): boolean {
+  isRunning(): boolean {
     return this.handler.tasks.get(this.id).timerID;
   }
 }
