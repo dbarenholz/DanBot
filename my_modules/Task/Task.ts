@@ -9,7 +9,9 @@ import TaskOptions from "./TaskOptions";
  * @class Task
  * @description A Task object is similar to a command execution, but without command!
  *              Tasks are pieces of code that the bot does on regular basis, such as every day, or every hour.
- * @version 0.2.1
+ *              Note that as of now there is no easy way to specify _when_ precisely a task needs to run:
+ *              only an interval is being used.
+ * @version 0.3.0
  */
 export default class Task {
   // See TaskOptions type for information
@@ -28,10 +30,10 @@ export default class Task {
    * @param options  The options for this task
    */
   constructor(options: TaskOptions) {
-    // Grab fields from options
+    // Grab fields from options.
     const { id, interval, channel, runOnStart, awaitReady, handler, category, description, data } = options;
 
-    // Set fields
+    // Set fields if present, and defaults otherwise.
     this.id = id;
     this.interval = interval;
     this.channel = channel;
@@ -44,7 +46,7 @@ export default class Task {
   }
 
   /**
-   * The task to perform.
+   * The task to perform. Should be implemented by an actual task.
    *
    * @param _this    The task instance
    * @param _client   The client that runs the task
@@ -75,7 +77,6 @@ export default class Task {
   public async pause(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.handler.tasks.get(this.id).task.isRunning()) {
-        // Task is not running:
         resolve("Task not running.");
       } else {
         // Task is running
@@ -106,15 +107,14 @@ export default class Task {
   public async continue(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.handler.tasks.get(this.id).task.isRunning()) {
-        // Task is already running:
         resolve("Already running.");
       } else {
         // Task is not yet running
         this.handler.tasks
           .get(this.id)
           .task.do(this.handler.client)
-          .then(resolve("Successfully started."))
-          .catch((err) => reject(`Error: "${err}"`));
+          .then(() => resolve("Successfully started."))
+          .catch((err: string) => reject(`Error: "${err}"`));
       }
     });
   }
@@ -168,6 +168,6 @@ export default class Task {
    * @returns a boolean indicating if the task is running
    */
   isRunning(): boolean {
-    return this.handler.tasks.get(this.id).timerID;
+    return this.handler.tasks.get(this.id).timerID != undefined;
   }
 }

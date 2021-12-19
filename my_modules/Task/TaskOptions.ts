@@ -1,11 +1,10 @@
-import TaskData from "./TaskData";
 import TaskHandler from "./TaskHandler";
 
 /**
  * @author Barenholz D.
  * @class TaskOptions
  * @description The relevant options for a task
- * @version 0.0.1
+ * @version 0.3.0
  */
 type TaskOptions = {
   // The name of the task, required
@@ -25,16 +24,16 @@ type TaskOptions = {
   // The description of the task, optional
   description?: string;
   /**
-   * Data (placeholders) related to the task
-   * Note that every item should be of the form
-   *
-   * data: {
-   *   some_data_item: {
-   *     doc: "documentation",
-   *     value: 5, // actual value
-   *     init: 0 // value to reset to
-   *   }
-   * }
+   * Data (placeholders) related to the task, example:
+   * ```raw
+       data: {
+         some_data_item: {
+           doc: "documentation",
+           value: 5, // actual value (can be object)
+           init: 0 // value to reset to (can be object)
+        }
+       }
+     ```
    */
   data?: any;
 };

@@ -7,7 +7,7 @@ import Task from "../my_modules/Task/Task";
  * @author Barenholz D.
  * @class CountingTask
  * @description A simple task that counts up inside a particular discord channel.
- * @version 0.2.1
+ * @version 0.3.0
  */
 class CountingTask extends Task {
   constructor() {
@@ -33,6 +33,7 @@ class CountingTask extends Task {
     });
   }
 
+  // The task to do. This is the code that runs.
   task(_this: Task, client: AkairoClient, ms: number): TimedPromise<String> {
     const current = _this.data.counter.value;
 

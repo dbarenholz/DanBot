@@ -10,7 +10,7 @@ import type TaskData from "./TaskData";
  * @author Barenholz D.
  * @class TaskHandler
  * @description Loads tasks and registers them with EventEmitters
- * @version 0.2.1
+ * @version 0.3.0
  */
 export default class TaskHandler {
   /**
@@ -24,7 +24,7 @@ export default class TaskHandler {
   client: AkairoClient;
 
   /**
-   * tasks: A collection of tasks with its relevant data.
+   * tasks: A collection of tasks with its relevant TaskData.
    */
   tasks: Collection<string, TaskData>;
 
@@ -41,6 +41,8 @@ export default class TaskHandler {
   /**
    * Registers and loads all tasks not starting with "_"
    * Reasoning for filtering: You can easily exclude tasks by appending an underscore.
+   *
+   * Note that if a particular task has `runOnStart` set to `true`, they will run as soon as this method is called.
    */
   public registerAndLoadAll() {
     readdirSync(this.directory)

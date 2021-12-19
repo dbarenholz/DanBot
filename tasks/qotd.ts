@@ -8,8 +8,8 @@ import { load } from "cheerio";
 /**
  * @author Barenholz D.
  * @class QuoteOfTheDay
- * @description Task that involves webscraping.
- * @version 0.1.0
+ * @description Scrapes insightoftheday for their daily quote and posts it in discord.
+ * @version 0.3.0
  */
 class QuoteOfTheDay extends Task {
   constructor() {
@@ -20,7 +20,7 @@ class QuoteOfTheDay extends Task {
       runOnStart: true,
       // awaitReady is true by default
       category: "util",
-      description: "Task that involves webscraping.",
+      description: "Scrapes insightoftheday for their daily quote and posts it in discord.",
     });
   }
 
@@ -40,6 +40,7 @@ class QuoteOfTheDay extends Task {
     });
   }
 
+  // The task to do. This is the code that runs.
   task(_this: QuoteOfTheDay, client: AkairoClient, _ms: number) {
     return new TimedPromise<String>(async (resolve: (msg: string) => void, reject: (err: string) => any) => {
       // Ensure we have an actual URL for the image
